@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from service.service import SchedulingService
 from api.api_router import routers
+from core.config import Config
 
 def app_creator():
     print(f'웹서버 초기화 시작')
@@ -30,4 +31,4 @@ def test():
 
 if __name__ == '__main__':
     # test()
-    uvicorn.run('web_main:app', host="0.0.0.0", port=9999, reload=True)
+    uvicorn.run('web_main:app', host=Config.WEB_HOST, port=Config.WEB_PORT, reload=True)

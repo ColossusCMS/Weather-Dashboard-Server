@@ -36,6 +36,10 @@ DB_NAME = {DB명} -> str
 
 # 공공데이터 API
 API_KEY = {발급받은 API_KEY} -> str
+
+# 웹서버 설정
+WEB_HOST = {호스트 주소} -> str
+WEB_PORT = {포트번호} -> int
 ```
 
 ## 3. 프로그램 설명
@@ -119,8 +123,8 @@ root/
         ├ convert.py
         ├ response.py
         ├ result_code.py
-        └ singleton.py
-    └ main.py
+    ├ schedule_main.py
+    └ web_main.py
 ├ .env
 ├ .gitignore
 ├ favicon.ico
@@ -135,7 +139,7 @@ root/
 - basetime에 해당하는 API 호출 및 데이터 가공 처리
 3. DB Connect 및 데이터 Insert, Select
 - 가공한 데이터 DB에 Insert, 최신 날씨 정보 Select
-4. 최신 날씨 정보 전달
+4. (웹서버) 최신 날씨 정보 전달
 - 클라이언트로부터 API호출 시 최신 날씨 정보 전송
 
 ## 7. API Docs
