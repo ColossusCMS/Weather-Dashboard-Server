@@ -1,11 +1,11 @@
 import pymysql
 
-from app.util.response import create_response
-from app.util.result_code import ResultCode
-from app.service.weather_service import WeatherService
-from app.core.database import MySQLDatabase
-from app.repository.repository import Repository
-from app.model.sql import SqlModel
+from util.response import create_response
+from util.result_code import ResultCode
+from service.weather_service import WeatherService
+from core.database import MySQLDatabase
+from repository.repository import Repository
+from model.sql import SqlModel
 
 class WeatherServiceImpl(WeatherService):
     # 최신 날씨 정보 조회

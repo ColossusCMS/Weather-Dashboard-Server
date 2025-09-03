@@ -1,5 +1,5 @@
-from app.model.sql import SqlModel
-from app.util.convert import create_insert_values, convert_select_keys, convert_where_params
+from model.sql import SqlModel
+from util.convert import create_insert_values, convert_select_keys, convert_where_params
 
 class Repository:
     # SELECT문

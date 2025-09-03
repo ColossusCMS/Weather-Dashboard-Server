@@ -2,11 +2,11 @@ import datetime
 import copy
 import pymysql
 
-from app.service.service import ApiService, SchedulingService
-from app.core.database import MySQLDatabase
-from app.repository.repository import Repository
-from app.model.sql import SqlModel
-from app.repository.api_repository import VilageFcst, MidFcst, LivingWthr, RiseSet, Arpltn
+from service.service import ApiService, SchedulingService
+from core.database import MySQLDatabase
+from repository.repository import Repository
+from model.sql import SqlModel
+from repository.api_repository import VilageFcst, MidFcst, LivingWthr, RiseSet, Arpltn
 
 class ApiServiceImpl(ApiService):
     def call_api(self, api_code, basetime):

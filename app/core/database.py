@@ -1,6 +1,6 @@
 import pymysql
 from abc import ABC, abstractmethod
-from app.core.config import configs
+from core.config import configs
 
 class Database(ABC):
     @abstractmethod

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
-from app.service.weather_service import WeatherService
-from app.core.dependencies import get_weather_service
+from service.weather_service import WeatherService
+from core.dependencies import get_weather_service
 
 router = APIRouter(
     prefix='/weather',
