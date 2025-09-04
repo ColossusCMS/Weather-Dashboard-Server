@@ -24,8 +24,8 @@ pip install -r requirements.txt
 - pip install fastapi
 - pip install uvicorn[standard]
 
-### 2. .env 구성
-- .env파일 생성 후 하단의 샘플에 맞춰서 작성
+### 2. .env 구성 및 start_app.sh 파일
+- [required] .env파일 생성 후 하단의 샘플에 맞춰서 작성
 ```
 # MySQL or MariaDB
 DB_HOST = {DB 주소} -> str
@@ -40,6 +40,18 @@ API_KEY = {발급받은 API_KEY} -> str
 # 웹서버 설정
 WEB_HOST = {호스트 주소} -> str
 WEB_PORT = {포트번호} -> int
+```
+- [optional] start_app.sh 파일 (리눅스 내 서비스 등록용)
+```
+# 각 서비스를 실행하기 위한 sh파일
+#!/bin/bash
+
+python3 web_main.py & # 웹서버 실행
+python3 schedule_main.py & # 스케줄러 실행
+python3 log_auto_delete_main.py & # 로그 파일 자동 정리 실행
+
+# 스크립트가 종료되지 않도록 대기
+wait
 ```
 
 ## 3. 프로그램 설명
@@ -101,13 +113,20 @@ E- Paper 날씨 대시보드 시스템의 백엔드 서버입니다.
 root/
 ├ app/
     ├ api/
-        ├ endpoint/
+        ├ endpoints/
             └ weather.py
         └ api_router.py
     ├ core/
         ├ config.py
         ├ database.py
         └ dependecies.py
+    ├ log/  // 운영 시에만 생성
+        ├ db/
+            └ db_logger.log
+        ├ schedule/
+            └ schedule_logger.log
+        └ web/
+            └ web_logger.log
     ├ model/
         └ sql.py
     ├ repository/
@@ -121,14 +140,17 @@ root/
         └ weather_service.py
     ├ util/
         ├ convert.py
+        ├ logger.py
         ├ response.py
-        ├ result_code.py
+        └ result_code.py
+    ├ start_apps.sh
+    ├ log_auto_delete_main.py
     ├ schedule_main.py
     └ web_main.py
 ├ .env
 ├ .gitignore
 ├ favicon.ico
-├ requirement.txt
+├ requirements.txt
 └ README.md
 ```
 
