@@ -5,6 +5,6 @@ __pycache__/
 
 .env
 
-log/
+app/log/
 
 app/start_apps.sh
