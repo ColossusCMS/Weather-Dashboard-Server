@@ -6,7 +6,7 @@ from util.logger import Logger
 
 logger = Logger.get_logger('schedule_logger')
 
-log_dir = os.path.join(os.path.realpath(__file__), 'log')
+log_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'log')
 
 # 오래된 로그 파일 삭제 함수
 def delete_old_files(path_target, days_elapsed):
