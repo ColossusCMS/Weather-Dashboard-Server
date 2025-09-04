@@ -1,11 +1,15 @@
 import uvicorn
 from fastapi import FastAPI
-from service.service import SchedulingService
+from service.impl.service_impl import SchedulingServiceImpl
 from api.api_router import routers
 from core.config import Config
+from util.result_code import ResultCode
+from util.logger import Logger
+
+web_logger = Logger.get_logger('web_logger')
 
 def app_creator():
-    print(f'웹서버 초기화 시작')
+    Logger.info(web_logger, '웹서버 초기화 시작')
     app = FastAPI(
         title='Weather Dashboard Server',
         summary='summary',
@@ -18,16 +22,17 @@ def app_creator():
     
     @app.get('/')
     def root():
-        return {'resultCode' : 200, 'resultMsg': 'Service is Working'}
+        return {'resultCode' : ResultCode.SUCCESS, 'resultMsg': 'Service is Working'}
 
-    print(f'웹서버 초기화 완료')
+    Logger.info(web_logger, '웹서버 초기화 완료')
     return app
 
 app = app_creator()
 
 # 테스트 실행용 메소드
 def test():
-    SchedulingService.scheduling_process('18:15')
+    scheduling_service = SchedulingServiceImpl()
+    scheduling_service.scheduling_process('02:15')
 
 if __name__ == '__main__':
     # test()

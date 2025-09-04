@@ -1,12 +1,16 @@
 import datetime
 import copy
 import pymysql
+import time
 
 from service.service import ApiService, SchedulingService
 from core.database import MySQLDatabase
 from repository.repository import Repository
 from model.sql import SqlModel
 from repository.api_repository import VilageFcst, MidFcst, LivingWthr, RiseSet, Arpltn
+from util.logger import Logger
+
+api_logger = Logger.get_logger('schedule_logger')
 
 class ApiServiceImpl(ApiService):
     def call_api(self, api_code, basetime):
@@ -48,7 +52,7 @@ class ApiServiceImpl(ApiService):
                     if i['category'] in value_dict:
                        result[value_dict[i['category']]] = i['obsrValue'] # 'WD_DAY_TMP'
             except Exception as e:
-                print(f'{e.add_note} args: {e.args}')
+                Logger.error(api_logger, f'{e.add_note} args: {e.args}')
         elif parameter['API_CODE'] == 'FCST_FORECAST':
             # 초단기예보
             item = vilageFcst.vilage_fcst_info_service('forecast')
@@ -95,7 +99,7 @@ class ApiServiceImpl(ApiService):
                         date_time = datetime.datetime.strptime(fcst_date + fcst_time, date_format)
                         diff = date_time - convert_now
                         diff_hour = int(diff.total_seconds()/3600)
-                        if diff_hour < 11:
+                        if diff_hour > 0 and diff_hour < 11:
                             value = value_dict[category].replace('n', str(diff_hour))
                             result[value] = fcst_value
                         
@@ -118,8 +122,8 @@ class ApiServiceImpl(ApiService):
                                 value = value_dict[category].replace('n', str(diff_days))
                                 result[value] = fcst_value
             except Exception as e:
-                print(f'{e.add_note} args: {e.args}')
-        print(result)
+                Logger.error(api_logger, f'{e.add_note} args: {e.args}')
+        Logger.info(api_logger, f'result: {result}')
         return result
         
     # 중기육상예보, 중기기온조회
@@ -153,11 +157,11 @@ class ApiServiceImpl(ApiService):
                     if key in i.keys():
                         result[value] = i[key]
                     else:
-                        print(f'{key}없음')
+                        Logger.info(api_logger, f'{key}없음')
         except Exception as e:
-                print(f'{e.add_note} args: {e.args}')
+            Logger.error(api_logger, f'{e.add_note} args: {e.args}')
         
-        print(result)
+        Logger.info(api_logger, f'result: {result}')
         return result
     
     # 자외선지수
@@ -179,9 +183,8 @@ class ApiServiceImpl(ApiService):
                         for key, value in value_dict.items():
                             result[value] = i[key]
             except Exception as e:
-                print(f'{e.add_note} args: {e.args}')
-        
-        print(result)
+                Logger.error(api_logger, f'{e.add_note} args: {e.args}')
+        Logger.info(api_logger, f'result: {result}')
         return result
     
     # 대기오염(미세먼지)
@@ -216,9 +219,9 @@ class ApiServiceImpl(ApiService):
                             for key, value in value_dict.items():
                                 result[value] = i[key]
                             break
-                print(result)
             except Exception as e:
-                print(f'{e.add_note} args: {e.args}')
+                Logger.error(api_logger, f'{e.add_note} args: {e.args}')
+        Logger.info(api_logger, f'result: {result}')
         return result
         
     # 출몰시각
@@ -237,14 +240,14 @@ class ApiServiceImpl(ApiService):
             try:
                 for key, value in value_dict.items():
                     result[value] = item[key]
-                # print(result)
             except Exception as e:
-                print(f'{e.add_note} args: {e.args}')
+                Logger.error(api_logger, f'{e.add_note} args: {e.args}')
+        Logger.info(api_logger, f'result: {result}')
         return result
     
 class SchedulingServiceImpl(SchedulingService):
     # 해당 시간대에 실행할 동작
-    def scheduling_process(basetime):
+    def scheduling_process(self, basetime):
         """
         - 현재 시간대에 해당하는 API 호출
         1) DB 내 최신 날씨 정보 조회
@@ -287,7 +290,7 @@ class SchedulingServiceImpl(SchedulingService):
         # [0]: API_CODE, [1]: API_NAME, [2]: REGION_NAME, [3]: REGION_CODE, [4]: NX, [5]: NY
         
         api_list = Repository.select(
-            cursor=conn.cursor(),
+            cursor=conn.cursor(pymysql.cursors.DictCursor),
             sql_model=SqlModel(
                 select_keys=['*'],
                 tbl_name='tbl_api_code_list'
@@ -297,7 +300,15 @@ class SchedulingServiceImpl(SchedulingService):
         # 현재 basetime을 조건으로 조회할 API 및 시간 PARAMETER 조회
         # -> 조회 값이 NULL이 아닌 항목에 대해서 API를 호출함, NULL이면 continue
         for api_code in api_list:
-            select_result = db_connect_manager.select_list(conn=conn, select_keys=[api_code['API_CODE']], tbl_name='tbl_api_basetime', where_keys=['CALL_TIME'], where_values=[basetime])
+            select_result = Repository.select(
+                cursor=conn.cursor(),
+                sql_model=SqlModel(
+                    select_keys=[api_code['API_CODE']],
+                    tbl_name='tbl_api_basetime',
+                    where_keys=['CALL_TIME'],
+                    where_values=[basetime]
+                )
+            )
             if select_result[0][0] is None or select_result[0][0] == 0:
                 continue
             
@@ -312,32 +323,23 @@ class SchedulingServiceImpl(SchedulingService):
             
             # API 호출
             # 각 API_CODE에 따른 API를 선택해 호출
-            result = scheduling_process_call_api(api_code, select_result[0][0])
+            api_service = ApiServiceImpl()
+            result = api_service.call_api(api_code=api_code, basetime=select_result[0][0])
             # result = {'key':'value'}
             # result값 result_dict로 병합
             # 조회한 최신 정보에서 API로 호출을 통해 얻은 값만 갱신
             for key, value in result.items():
                 result_dict[key] = value
-            
-            # print(result_dict)
             time.sleep(1)
             
         # 새로 만들어진 정보로 DB에 insert
-        result_dict['WD_DATETIME'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        result_dict['WD_DATETIME'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         result = Repository.insert(
             conn=conn,
             tbl_name='tbl_weather_data',
             insert_data=result_dict
         )
-        # result = db_connect_manager.insert(conn, result_dict)
-        print(result)
+        Logger.info(api_logger, f'result: {result}')
         
         # DB 연결 종료
         MySQLDatabase.db_close(conn)
-        # db_connect_manager.db_close(conn)
-        
-    # 스케줄링 프로세스 내 API 호출
-    def scheduling_process_call_api(api_code, basetime):
-        api_service = ApiService()
-        result = api_service.call_api(api_code=api_code, basetime=basetime)
-        return result

@@ -4,3 +4,7 @@ __pycache__/
 *$py.class
 
 .env
+
+log/
+
+app/start_apps.sh

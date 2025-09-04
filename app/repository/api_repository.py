@@ -3,7 +3,10 @@ from requests.adapters import HTTPAdapter
 import json
 import xmltodict
 
-from app.core.config import configs
+from core.config import configs
+from util.logger import Logger
+
+api_logger = Logger.get_logger('schedule_logger')
 
 # 초단기실황, 초단기예보, 단기예보
 class VilageFcst:
@@ -23,15 +26,15 @@ class VilageFcst:
         try:
             if param == 'current':
                 # 초단기실황 api
-                print('초단기실황 API 조회')
+                Logger.info(api_logger, '초단기실황 API 조회')
                 api = f"http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey={configs.API_KEY}&numOfRows=10&pageNo=1&base_date={self.BASE_DATE}&base_time={self.BASE_TIME}&nx={self.NX}&ny={self.NY}&dataType=JSON"
             elif param == 'forecast':
                 # 초단기예보 api
-                print('초단기예보 API 조회')
+                Logger.info(api_logger, '초단기예보 API 조회')
                 api = f"http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?serviceKey={configs.API_KEY}&numOfRows=60&pageNo=1&base_date={self.BASE_DATE}&base_time={self.BASE_TIME}&nx={self.NX}&ny={self.NY}&dataType=JSON"
             else:
                 # 단기예보 api
-                print('단기예보 API 조회')
+                Logger.info(api_logger, '단기예보 API 조회')
                 api = f"http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey={configs.API_KEY}&numOfRows=1000&pageNo=1&base_date={self.BASE_DATE}&base_time={self.BASE_TIME}&nx={self.NX}&ny={self.NY}&dataType=JSON"
             
             # response = requests.get(api)
@@ -44,7 +47,7 @@ class VilageFcst:
             body = json_ob['response']['body']['items']['item']
             return body
         except Exception as e:
-            print(f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
+            Logger.error(api_logger, f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
             return []
 
 # 중기육상예보, 중기기온예보
@@ -61,9 +64,11 @@ class MidFcst:
         try:
             if param == 'midland':
                 # 중기육상예보 api
+                Logger.info(api_logger, '중기육상예보 API 조회')
                 api = f"http://apis.data.go.kr/1360000/MidFcstInfoService/getMidLandFcst?serviceKey={configs.API_KEY}&numOfRows=10&pageNo=1&regId={self.REG_ID}&tmFc={self.TMFC}&dataType=JSON"
             elif param == 'midtmp':
                 # 중기기온조회 api
+                Logger.info(api_logger, '중기기온조회 API 조회')
                 api = f"http://apis.data.go.kr/1360000/MidFcstInfoService/getMidTa?serviceKey={configs.API_KEY}&numOfRows=10&pageNo=1&regId={self.REG_ID}&tmFc={self.TMFC}&dataType=JSON"
             # response = requests.get(api)
             # contents = response.text
@@ -75,7 +80,7 @@ class MidFcst:
             body = json_ob['response']['body']['items']['item']
             return body
         except Exception as e:
-            print(f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
+            Logger.error(api_logger, f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
             return []
 
 # 자외선지수
@@ -92,6 +97,7 @@ class LivingWthr:
         try:
             if param == 'uvidx':
                 # 자외선지수조회 api
+                Logger.info(api_logger, '자외선지수조회 API 조회')
                 api = f"http://apis.data.go.kr/1360000/LivingWthrIdxServiceV4/getUVIdxV4?serviceKey={configs.API_KEY}&pageNo=1&numOfRows=10&areaNo={self.AREA_NO}&time={self.TIME}&dataType=JSON"
             # response = requests.get(api)
             # contents = response.text
@@ -103,7 +109,7 @@ class LivingWthr:
             body = json_ob['response']['body']['items']['item']
             return body
         except Exception as e:
-            print(f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
+            Logger.error(api_logger, f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
             return []
     
 # 대기오염
@@ -118,6 +124,7 @@ class Arpltn:
         try:
             if param == 'msrstn':
                 # 측정소별 측정정보 조회 api
+                Logger.info(api_logger, '측정소별 측정정보 조회 API 조회')
                 api = f"http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?stationName={self.STATION_NAME}&dataTerm=daily&pageNo=1&numOfRows=100&returnType=json&serviceKey={configs.API_KEY}&ver=1.3"
             # response = requests.get(api)
             # contents = response.text
@@ -129,7 +136,7 @@ class Arpltn:
             body = json_ob['response']['body']['items']
             return body
         except Exception as e:
-            print(f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
+            Logger.error(api_logger, f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
             return []
     
 # 출몰시각
@@ -146,6 +153,7 @@ class RiseSet:
         try:
             if param == 'area':
                 # 지역별 해달 출몰시각 정보조회
+                Logger.info(api_logger, '지역별 해달 출몰시각 정보조회 API 조회')
                 api = f"http://apis.data.go.kr/B090041/openapi/service/RiseSetInfoService/getAreaRiseSetInfo?location={self.LOCATION}&locdate={self.LOCDATE}&ServiceKey={configs.API_KEY}"
             # response = requests.get(api)
             # contents = response.text
@@ -159,5 +167,5 @@ class RiseSet:
             body = json_ob['response']['body']['items']['item']
             return body
         except Exception as e:
-            print(f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
+            Logger.error(api_logger, f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
             return []
