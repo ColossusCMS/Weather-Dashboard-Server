@@ -28,8 +28,8 @@ def delete_old_files(path_target, days_elapsed):
 # 삭제 자동 프로세스
 def auto_delete_process():
     while True:
-        now = datetime.datetime.now()
-        Logger.info(logger, f'{now.strftime('%Y-%m-%d')} 로그 파일 삭제 프로세스 시작')
+        now = datetime.datetime.now().strftime('%Y-%m-%d')
+        Logger.info(logger, f'{now} 로그 파일 삭제 프로세스 시작')
         delete_old_files('web', 7)
         delete_old_files('schedule', 7)
         time.sleep(24 * 60 * 60)    # 하루마다 실행
