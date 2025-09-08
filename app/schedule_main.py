@@ -3,7 +3,7 @@ import schedule
 from core.database import MySQLDatabase
 from repository.repository import Repository
 from model.sql import SqlModel
-from service.service import SchedulingService
+from service.impl.service_impl import SchedulingServiceImpl
 from util.logger import Logger
 
 schedule_logger = Logger.get_logger('schedule_logger')
@@ -26,8 +26,10 @@ def schedule_creator():
         )
         MySQLDatabase.db_close(conn)
         
+        schedule_service_impl = SchedulingServiceImpl()
+        
         for basetime in basetime_list:
-            schedule.every().day.at(basetime[0]).do(SchedulingService.scheduling_process, basetime[0])
+            schedule.every().day.at(basetime[0]).do(schedule_service_impl.scheduling_process, basetime[0])
             Logger.info(schedule_logger, f'Create \'{basetime[0]}\' scheduling process!!')
         
         Logger.info(schedule_logger, '스케줄링 초기화 완료')

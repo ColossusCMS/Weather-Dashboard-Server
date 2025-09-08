@@ -217,7 +217,12 @@ class ApiServiceImpl(ApiService):
                     for i in item:
                         if i['dataTime'] == ago:
                             for key, value in value_dict.items():
-                                result[value] = i[key]
+                                if i[key] == '-':
+                                    result[value] = 0
+                                elif i[key] == None:
+                                    result[value] = 1
+                                else:
+                                    result[value] = i[key]
                             break
             except Exception as e:
                 Logger.error(api_logger, f'{e.add_note} args: {e.args}')
@@ -330,7 +335,7 @@ class SchedulingServiceImpl(SchedulingService):
             # 조회한 최신 정보에서 API로 호출을 통해 얻은 값만 갱신
             for key, value in result.items():
                 result_dict[key] = value
-            time.sleep(1)
+            # time.sleep(1)
             
         # 새로 만들어진 정보로 DB에 insert
         result_dict['WD_DATETIME'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')

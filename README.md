@@ -12,7 +12,7 @@
     - Python : 3.10.12
     - DB : MariaDB 10.6.22
 
-## 2. 필요 PIP install 목록 및 .env
+## 2. 필요 pip install 목록 및 .env
 ### 1. 필요 pip install 목록
 ```
 pip install -r requirements.txt
