@@ -12,21 +12,25 @@ from util.logger import Logger
 
 api_logger = Logger.get_logger('schedule_logger')
 
+# 측정소명을 집어넣는 부분 구현
+# 측정소명은 DB에서 가져오도록
+
 class ApiServiceImpl(ApiService):
     def call_api(self, api_code, basetime):
-        # dt_now = datetime.datetime(2025, 8, 25, 23, 50, 11)
-        dt_now = datetime.datetime.now()
-        # 초단기실황, 초단기예보, 단기예보
-        if api_code['API_CODE'] == 'FCST_CURRENT' or api_code['API_CODE'] == 'FCST_FORECAST' or api_code['API_CODE'] == 'FCST_VILAGE':
-            result = self.process_vilage_fcst(dt_now, api_code, basetime)
-        elif api_code['API_CODE'] == 'MID_FCST_INFO' or api_code['API_CODE'] == 'MID_TMP_INFO':
-            result = self.process_mid_fcst(dt_now, api_code, basetime)
-        elif api_code['API_CODE'] == 'UV_IDX_V4_INFO':
-            result = self.process_living_wthr(dt_now, api_code, basetime)
-        elif api_code['API_CODE'] == 'AREA_RISE_INFO':
-            result = self.process_rise_set(dt_now, api_code)
-        elif api_code['API_CODE'] == 'ARPLTN_INFO':
-            result = self.process_arpltn(dt_now, api_code)
+        if basetime is not None:
+            # dt_now = datetime.datetime(2025, 8, 25, 23, 50, 11)
+            dt_now = datetime.datetime.now()
+            # 초단기실황, 초단기예보, 단기예보
+            if api_code['API_CODE'] == 'FCST_CURRENT' or api_code['API_CODE'] == 'FCST_FORECAST' or api_code['API_CODE'] == 'FCST_VILAGE':
+                result = self.process_vilage_fcst(dt_now, api_code, basetime)
+            elif api_code['API_CODE'] == 'MID_FCST_INFO' or api_code['API_CODE'] == 'MID_TMP_INFO':
+                result = self.process_mid_fcst(dt_now, api_code, basetime)
+            elif api_code['API_CODE'] == 'UV_IDX_V4_INFO':
+                result = self.process_living_wthr(dt_now, api_code, basetime)
+            elif api_code['API_CODE'] == 'AREA_RISE_INFO':
+                result = self.process_rise_set(dt_now, api_code)
+            elif api_code['API_CODE'] == 'ARPLTN_INFO':
+                result = self.process_arpltn(dt_now, api_code)
         return result
     
     # 초단기실황, 초단기예보, 단기예보
@@ -81,9 +85,10 @@ class ApiServiceImpl(ApiService):
             # [WD_DAY_SKY_nHR, WD_DAY_TMP_nHR, WD_DAY_POP_nHR, WD_DAY_TMN, WD_DAY_TMX] n: +1 ~ +10
             # [12:00, TMP: 12시 기온, 18:00, TMP: 18시 기온, TMN: 일 최저기온, TMX: 일 최고기온,
             # 12:00, POP: 12시 강수확률, 18:00, POP: 18시 강수확률]
-            # [WD_WF_nAM, WD_WF_nPM, WD_MAXn, WD_MINn, WD_RNST_nAM, WD_RNST_nPM] n: +1 ~ +3
+            # [WD_WF_SKY_nAM, WD_WF_PTY_nAM, WD_WF_SKY_nPM, WD_WF_PTY_nPM, WD_MAXn, WD_MINn, WD_RNST_nAM, WD_RNST_nPM] n: +1 ~ +3
             value_dict = {'TMP':'WD_DAY_TMP_nHR', 'SKY':'WD_DAY_SKY_nHR', 'PTY':'WD_DAY_PTY_nHR', 'POP':'WD_DAY_POP_nHR',
-                          'AM_TMP':'WD_WF_nAM', 'PM_TMP':'WD_WF_nPM', 'TMN':'WD_MINn', 'TMX':'WD_MAXn', 'AM_POP':'WD_RNST_nAM', 'PM_POP':'WD_RNST_nPM'}
+                          'AM_SKY':'WD_WF_SKY_nAM', 'AM_PTY':'WD_WF_PTY_nAM', 'PM_SKY':'WD_WF_SKY_nPM', 'PM_PTY':'WD_WF_PTY_nPM',
+                          'TMN':'WD_MINn', 'TMX':'WD_MAXn', 'AM_POP':'WD_RNST_nAM', 'PM_POP':'WD_RNST_nPM'}
             date_format = '%Y%m%d%H%M'
             convert_now = datetime.datetime.strptime(date.strftime('%Y%m%d%H00'), date_format) # 202508240500
             convert_now_day = datetime.datetime.strptime(date.strftime('%Y%m%d0000'), date_format) # 202508240000
@@ -106,9 +111,9 @@ class ApiServiceImpl(ApiService):
                         # 일차
                         day = datetime.datetime.strptime(fcst_date + '0000', date_format)
                         diff_days = (day - convert_now_day).days
-                        if diff_days > 0:
+                        if diff_days > 0 and diff_days < 7:
                             # 일자가 하루 이상 차이가 나고
-                            if category == 'TMP' or category == 'POP':
+                            if category == 'SKY' or category == 'PTY' or category == 'POP':
                                 if fcst_time == '1200':
                                     # 시간이 1200이면 오전
                                     value = value_dict['AM_' + category].replace('n', str(diff_days))
@@ -305,6 +310,9 @@ class SchedulingServiceImpl(SchedulingService):
         # 현재 basetime을 조건으로 조회할 API 및 시간 PARAMETER 조회
         # -> 조회 값이 NULL이 아닌 항목에 대해서 API를 호출함, NULL이면 continue
         for api_code in api_list:
+            if api_code['API_CODE'] == 'STATION_NAME':
+                continue
+            
             select_result = Repository.select(
                 cursor=conn.cursor(),
                 sql_model=SqlModel(
@@ -314,7 +322,7 @@ class SchedulingServiceImpl(SchedulingService):
                     where_values=[basetime]
                 )
             )
-            if select_result[0][0] is None or select_result[0][0] == 0:
+            if select_result is None or select_result[0][0] is None or select_result[0][0] == 0:
                 continue
             
             # ex) basetime = '00:15'

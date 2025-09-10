@@ -17,6 +17,7 @@
 ```
 pip install -r requirements.txt
 ```
+- pip install requests
 - pip install schedule
 - pip install pymysql
 - pip install keyboard
