@@ -29,7 +29,7 @@ class WeatherServiceImpl(WeatherService):
             result_code = ResultCode.SUCCESS
             result_msg = "SUCCESS"
         except Exception as e:
-            Logger.error(web_logger, f'{e.add_note} args: {e.args}')
+            Logger.error(web_logger, f'{e}\nargs: {e.args}')
             result_code = ResultCode.INTERNAL_SERVER_ERROR
             result_msg = "INTERNAL_SERVER_ERROR"
             current_data = []

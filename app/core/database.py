@@ -22,7 +22,7 @@ class MySQLDatabase(Database):
             Logger.info(db_logger, f'{configs.DB_NAME} DB 연결 완료')
             return conn
         except Exception as e:
-            Logger.error(db_logger, f'{e.add_note} args: {e.args}')
+            Logger.error(db_logger, f'{e}\nargs: {e.args}')
             Logger.error(db_logger, 'DB 연결 중 오류 발생')
             return None
         
@@ -31,5 +31,5 @@ class MySQLDatabase(Database):
             conn.close()
             Logger.info(db_logger, f'{configs.DB_NAME} DB 연결 해제 완료')
         except Exception as e:
-            Logger.error(db_logger, f'{e.add_note} args: {e.args}')
+            Logger.error(db_logger, f'{e}\nargs: {e.args}')
             Logger.error(db_logger, 'DB 연결 해제 중 오류 발생')

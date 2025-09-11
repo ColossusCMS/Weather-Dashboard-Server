@@ -26,7 +26,7 @@ class Repository:
             results = cursor.fetchall()
             return results
         except Exception as e:
-            Logger.error(db_logger, f'SELECT 중 오류 발생 {e.add_note} args: {e.args}')
+            Logger.error(db_logger, f'SELECT 중 오류 발생 {e}\nargs: {e.args}')
             return None
     
     # INSERT문
@@ -43,4 +43,4 @@ class Repository:
             conn.commit()
             Logger.info(db_logger, f'{cursor.rowcount}개의 행이 입력되었습니다.')
         except Exception as e:
-            Logger.error(db_logger, f'INSERT 중 오류 발생 {e.add_note} args: {e.args}')
+            Logger.error(db_logger, f'INSERT 중 오류 발생 {e}\nargs: {e.args}')

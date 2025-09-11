@@ -56,7 +56,7 @@ class ApiServiceImpl(ApiService):
                     if i['category'] in value_dict:
                        result[value_dict[i['category']]] = i['obsrValue'] # 'WD_DAY_TMP'
             except Exception as e:
-                Logger.error(api_logger, f'{e.add_note} args: {e.args}')
+                Logger.error(api_logger, f'{e}\nargs: {e.args}')
         elif parameter['API_CODE'] == 'FCST_FORECAST':
             # 초단기예보
             item = vilageFcst.vilage_fcst_info_service('forecast')
@@ -127,7 +127,7 @@ class ApiServiceImpl(ApiService):
                                 value = value_dict[category].replace('n', str(diff_days))
                                 result[value] = fcst_value
             except Exception as e:
-                Logger.error(api_logger, f'{e.add_note} args: {e.args}')
+                Logger.error(api_logger, f'{e}\nargs: {e.args}')
         Logger.info(api_logger, f'result: {result}')
         return result
         
@@ -164,7 +164,7 @@ class ApiServiceImpl(ApiService):
                     else:
                         Logger.info(api_logger, f'{key}없음')
         except Exception as e:
-            Logger.error(api_logger, f'{e.add_note} args: {e.args}')
+            Logger.error(api_logger, f'{e}\nargs: {e.args}')
         
         Logger.info(api_logger, f'result: {result}')
         return result
@@ -188,7 +188,7 @@ class ApiServiceImpl(ApiService):
                         for key, value in value_dict.items():
                             result[value] = i[key]
             except Exception as e:
-                Logger.error(api_logger, f'{e.add_note} args: {e.args}')
+                Logger.error(api_logger, f'{e}\nargs: {e.args}')
         Logger.info(api_logger, f'result: {result}')
         return result
     
@@ -230,7 +230,7 @@ class ApiServiceImpl(ApiService):
                                     result[value] = i[key]
                             break
             except Exception as e:
-                Logger.error(api_logger, f'{e.add_note} args: {e.args}')
+                Logger.error(api_logger, f'{e}\nargs: {e.args}')
         Logger.info(api_logger, f'result: {result}')
         return result
         
@@ -251,7 +251,7 @@ class ApiServiceImpl(ApiService):
                 for key, value in value_dict.items():
                     result[value] = item[key]
             except Exception as e:
-                Logger.error(api_logger, f'{e.add_note} args: {e.args}')
+                Logger.error(api_logger, f'{e}\nargs: {e.args}')
         Logger.info(api_logger, f'result: {result}')
         return result
     

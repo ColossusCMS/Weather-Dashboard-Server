@@ -47,7 +47,7 @@ class VilageFcst:
             body = json_ob['response']['body']['items']['item']
             return body
         except Exception as e:
-            Logger.error(api_logger, f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
+            Logger.error(api_logger, f'API 호출 중 오류 발생 {e}\nargs: {e.args}')
             return []
 
 # 중기육상예보, 중기기온예보
@@ -80,7 +80,7 @@ class MidFcst:
             body = json_ob['response']['body']['items']['item']
             return body
         except Exception as e:
-            Logger.error(api_logger, f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
+            Logger.error(api_logger, f'API 호출 중 오류 발생 {e}\nargs: {e.args}')
             return []
 
 # 자외선지수
@@ -109,7 +109,7 @@ class LivingWthr:
             body = json_ob['response']['body']['items']['item']
             return body
         except Exception as e:
-            Logger.error(api_logger, f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
+            Logger.error(api_logger, f'API 호출 중 오류 발생 {e}\nargs: {e.args}')
             return []
     
 # 대기오염
@@ -136,7 +136,7 @@ class Arpltn:
             body = json_ob['response']['body']['items']
             return body
         except Exception as e:
-            Logger.error(api_logger, f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
+            Logger.error(api_logger, f'API 호출 중 오류 발생 {e}\nargs: {e.args}')
             return []
     
 # 출몰시각
@@ -167,5 +167,5 @@ class RiseSet:
             body = json_ob['response']['body']['items']['item']
             return body
         except Exception as e:
-            Logger.error(api_logger, f'API 호출 중 오류 발생 {e.add_note} args: {e.args}')
+            Logger.error(api_logger, f'API 호출 중 오류 발생 {e}\nargs: {e.args}')
             return []

@@ -34,7 +34,7 @@ def schedule_creator():
         
         Logger.info(schedule_logger, '스케줄링 초기화 완료')
     except Exception as e:
-        Logger.error(schedule_logger, f'{e.add_note} args: {e.args}')
+        Logger.error(schedule_logger, f'{e}\nargs: {e.args}')
         Logger.error(schedule_logger, '스케줄링 초기화 오류')
 
 # 스케줄링을 실행하는 무한 루프
