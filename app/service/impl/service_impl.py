@@ -1,7 +1,6 @@
 import datetime
 import copy
 import pymysql
-import time
 
 from service.service import ApiService, SchedulingService
 from core.database import MySQLDatabase
@@ -165,6 +164,11 @@ class ApiServiceImpl(ApiService):
                         result[value] = i[key]
                     else:
                         Logger.info(api_logger, f'{key}없음')
+                        # 4일 후는 생성 여부에 따라서 다른 값을 사용하므로 없는 경우 강제로 공백으로 넣음
+                        # 4일 후 예보는 06시 발표에만 포함됨
+                        if key == 'wf4Am' or key == 'wf4Pm':
+                            result[value] = ''
+                            
         except Exception as e:
             Logger.error(api_logger, f'{e}\nargs: {e.args}')
         
