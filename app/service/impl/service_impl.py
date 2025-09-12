@@ -101,6 +101,7 @@ class ApiServiceImpl(ApiService):
                     
                     if category in value_dict:
                         # 시간차
+                        # 1시간 후 ~ 10시간 후 하늘 상태, 기온, 강수확률 생성
                         date_time = datetime.datetime.strptime(fcst_date + fcst_time, date_format)
                         diff = date_time - convert_now
                         diff_hour = int(diff.total_seconds()/3600)
@@ -109,6 +110,7 @@ class ApiServiceImpl(ApiService):
                             result[value] = fcst_value
                         
                         # 일차
+                        # 1일 후 ~ 4일 후 하늘 상태, 최고/최저 기온, 강수확률 생성
                         day = datetime.datetime.strptime(fcst_date + '0000', date_format)
                         diff_days = (day - convert_now_day).days
                         if diff_days > 0 and diff_days < 7:
@@ -295,6 +297,12 @@ class SchedulingServiceImpl(SchedulingService):
         )
         result_dict = copy.deepcopy(current_data[0])
         
+        # 조회 basetime(CALL_TIME)이 xx:15에 해당하면
+        # 강수확률을 1시간 후의 강수확률을 현재 강수확률에 복사
+        # 강수확률을 실시간으로 적용한 것처럼 보이기 위함
+        if ':45' in basetime:
+            result_dict['WD_DAY_POP'] = result_dict['WD_DAY_POP_1HR']
+        
         # API 목록 조회
         # -> API_CODE 및 PARAMETER 추출
         # [0]: API_CODE, [1]: API_NAME, [2]: REGION_NAME, [3]: REGION_CODE, [4]: NX, [5]: NY
@@ -344,15 +352,32 @@ class SchedulingServiceImpl(SchedulingService):
             for key, value in result.items():
                 result_dict[key] = value
             # time.sleep(1)
-            
+        
+        # 조회 basetime(CALL_TIME)이 23:15이면 (하루 중 API를 조회하는 가장 마지막 시간)
+        # 1일 후 예상 최고기온, 예상 최저기온을 현재 최고기온, 최저기온에 복사함
+        if basetime == '23:45':
+            result_dict['WD_DAY_TMN'] = result_dict['WD_MIN1']
+            result_dict['WD_DAY_TMX'] = result_dict['WD_MAX1']
+        
+        # 측정소명 조회 후 입력
+        station_name = Repository.select(
+            cursor=conn.cursor(),
+            sql_model=SqlModel(
+                select_keys=['REGION_NAME'],
+                tbl_name='tbl_api_code_list',
+                where_keys=['API_CODe'],
+                where_values=['STATION_NAME']
+            )
+        )
+        result_dict['WD_STATION_NAME'] = station_name
+        
         # 새로 만들어진 정보로 DB에 insert
         result_dict['WD_DATETIME'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        result = Repository.insert(
+        Repository.insert(
             conn=conn,
             tbl_name='tbl_weather_data',
             insert_data=result_dict
         )
-        Logger.info(api_logger, f'result: {result}')
         
         # DB 연결 종료
         MySQLDatabase.db_close(conn)
