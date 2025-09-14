@@ -25,7 +25,7 @@ class Logger:
                 
                 timed_file_handler = TimedRotatingFileHandler(filename=log_file, when='midnight', interval=1, encoding='utf-8')
                 timed_file_handler.setFormatter(formatter)
-                timed_file_handler.suffix = '%Y%m%d'
+                timed_file_handler.suffix = '%Y-%m-%d'
                 
                 logger.addHandler(timed_file_handler)
                 logger.setLevel(logging.INFO)
