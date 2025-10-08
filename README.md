@@ -28,6 +28,9 @@ pip install -r requirements.txt
 ### 2. .env 구성 및 start_app.sh 파일
 - [required] .env파일 생성 후 하단의 샘플에 맞춰서 작성
 ```
+# 프로그램 정보
+VERSION = {버전} -> str
+
 # MySQL or MariaDB
 DB_HOST = {DB 주소} -> str
 DB_PORT = {DB 포트} -> int
@@ -115,6 +118,7 @@ root/
 ├ app/
     ├ api/
         ├ endpoints/
+            ├ preperence.py
             └ weather.py
         └ api_router.py
     ├ core/
@@ -126,8 +130,10 @@ root/
             └ db_logger.log
         ├ schedule/
             └ schedule_logger.log
-        └ web/
+        ├ web/
             └ web_logger.log
+        └ preperence/
+            └ preperence_logger.log
     ├ model/
         └ sql.py
     ├ repository/
@@ -135,12 +141,15 @@ root/
         └ respository.py
     ├ service/
         ├ impl/
+            ├ preperence_impl.py
             ├ service_impl.py
             └ weather_service_impl.py
+        ├ preperence_service.py
         ├ service.py
         └ weather_service.py
     ├ util/
         ├ convert.py
+        ├ date.py
         ├ logger.py
         ├ response.py
         └ result_code.py
@@ -164,8 +173,26 @@ root/
 - 가공한 데이터 DB에 Insert, 최신 날씨 정보 Select
 4. (웹서버) 최신 날씨 정보 전달
 - 클라이언트로부터 API호출 시 최신 날씨 정보 전송
+5. 최신 날씨 정보 수동 새로고침
+- 스케줄러와 상관없이 호출 시 해당 시점에서 수동으로 날씨 정보를 조회함
+6. 측정소 정보 수정
+- 측정소 정보를 수정 등록함 (설정 관련 웹페이지에서 변경 가능)
+- 시/도 정보 관리 및 구/군/시 정보 관리
+1. (예정) 웹용 시스템 설정 화면 대응 기능
+- 측정소 정보 및 디지털 액자용 이미지 등록 기능
 
 ## 7. API Docs
 - /docs#/
 
 ## 8. 패치노트
+v 1.1 [2025-09-25]
+- 오늘 하늘 상태, 오늘 강수 형태가 정상적으로 값이 적용되지 않는 버그 수정
+- 단기예보 내 허용되지 않는 항목 생성과 관련된 버그 수정
+- 클라이언트용 API 추가 (설정값 조회, DISPLAY_STATUS 스위칭, 날씨 정보 새로고침 기능)
+- 설정화면 및 시스템 설정 관련 API 추가 작업 (측정소 정보 조회, 측정소 정보 수정 등록, 이미지 등록 등)
+- 설정(Preperence) 관련 logger 추가
+- 그 외 시스템 안정화 작업
+
+v 1.2 [2025-10-09]
+- 날씨 최신 정보 수동 새로고침 기능 추가
+- 클라이언트에서 호출 시 수동으로 호출 시점의 최신 날씨 정보를 생성함

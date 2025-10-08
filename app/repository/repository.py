@@ -1,5 +1,5 @@
 from model.sql import SqlModel
-from util.convert import create_insert_values, convert_select_keys, convert_where_params
+from util.convert import create_insert_values, convert_select_keys, convert_where_params, convert_update_params
 from util.logger import Logger
 
 db_logger = Logger.get_logger('db_logger')
@@ -44,3 +44,22 @@ class Repository:
             Logger.info(db_logger, f'{cursor.rowcount}개의 행이 입력되었습니다.')
         except Exception as e:
             Logger.error(db_logger, f'INSERT 중 오류 발생 {e}\nargs: {e.args}')
+            
+    # UPDATE문
+    def update(conn, sql_model: SqlModel):
+        cursor = conn.cursor()
+        try:
+            sql = f'UPDATE {sql_model.tbl_name}'
+            
+            update_keys = convert_update_params(sql_model.select_keys)
+            sql += f' SET {update_keys}'
+            
+            if sql_model.where_keys is not None:
+                sql += convert_where_params(sql_model.where_keys, sql_model.where_values)
+            
+            print(sql)
+            Logger.info(db_logger, f'SQL : {sql}')
+            cursor.execute(sql, sql_model.update_value)
+            conn.commit()
+        except Exception as e:
+            Logger.error(db_logger, f'UPDATE 중 오류 발생 {e}\nargs: {e.args}')

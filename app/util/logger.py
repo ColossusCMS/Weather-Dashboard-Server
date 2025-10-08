@@ -59,3 +59,4 @@ def _to_print(message):
 Logger.get_logger('web_logger', sub_dir='web')
 Logger.get_logger('schedule_logger', sub_dir='schedule')
 Logger.get_logger('db_logger', sub_dir='db')
+Logger.get_logger('preperence_logger', sub_dir='preperence')

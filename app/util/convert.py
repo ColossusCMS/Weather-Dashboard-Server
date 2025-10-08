@@ -18,7 +18,19 @@ def convert_where_params(where_keys: list, where_values: list):
     sql = ' WHERE'
     
     for i in range(len(where_keys)):
-        sql += f' {where_keys[i]} = \'{where_values[i]}\''
         if i > 0:
             sql += f' AND {where_keys[i]} = \'{where_values[i]}\''
+        else:
+            sql += f' {where_keys[i]} = \'{where_values[i]}\''
+        
     return sql
+
+
+# [key] => key=%s
+# [key1, key2] => key1=%s, key2=%s
+def convert_update_params(select_keys: list):
+    key_value_list = []
+    for i in range(len(select_keys)):
+        key_value = select_keys[i] + '=%s '
+        key_value_list.append(key_value)
+    return ','.join(key_value_list)

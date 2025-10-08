@@ -12,3 +12,8 @@ router = APIRouter(
 @router.get('/getRecentWeatherData.do')
 def get_recent_weather_data(weather_service: WeatherService = Depends(get_weather_service)):
     return weather_service.get_current_weather_data()
+
+# 날씨 정보 새로고침
+@router.get('/refreshWeatherData.do')
+def refresh_weather_data(weather_service: WeatherService = Depends(get_weather_service)):
+    return weather_service.refresh_weather_data()

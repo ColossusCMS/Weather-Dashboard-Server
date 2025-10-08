@@ -32,7 +32,7 @@ app = app_creator()
 # 테스트 실행용 메소드
 def test():
     scheduling_service = SchedulingServiceImpl()
-    scheduling_service.scheduling_process('02:15')
+    scheduling_service.scheduling_process('04:45')
 
 if __name__ == '__main__':
     # test()

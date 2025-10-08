@@ -56,19 +56,19 @@ class ApiServiceImpl(ApiService):
                        result[value_dict[i['category']]] = i['obsrValue'] # 'WD_DAY_TMP'
             except Exception as e:
                 Logger.error(api_logger, f'{e}\nargs: {e.args}')
-        elif parameter['API_CODE'] == 'FCST_FORECAST':
+        # elif parameter['API_CODE'] == 'FCST_FORECAST':
             # 초단기예보
-            item = vilageFcst.vilage_fcst_info_service('forecast')
+#            item = vilageFcst.vilage_fcst_info_service('forecast')
             # API 조회 오류 등으로 item이 빈 값인 경우 다시 API를 호출하도록 개선
-            if item is None or item == [] or len(item) == 0:
-                item = vilageFcst.vilage_fcst_info_service('forecast')
+#            if item is None or item == [] or len(item) == 0:
+#                item = vilageFcst.vilage_fcst_info_service('forecast')
             # 필요 데이터 추출
             # n시간 후 하늘상태, n시간 후 강수형태, n시간 후 기온, n시간 후 강수확률
             # [T1H: 기온, SKY: 하늘상태, PTY: 강수형태]
             # [WD_DAY_SKY_nHR, WD_DAY_PTY_nHR, WD_DAY_TMP_nHR, WD_DAY_POP_nHR] n: +1 ~ +6
             
-            # value_dict = {'T1H':'WD_DAY_TMP', 'SKY':'', 'REH':'', 'PTY':'', 'VEC':'', 'WSD':''}
-            # now = datetime.datetime.now()
+#            value_dict = {'T1H':'WD_DAY_TMP', 'SKY':'', 'REH':'', 'PTY':'', 'VEC':'', 'WSD':''}
+#            now = datetime.datetime.now()
                 
         elif parameter['API_CODE'] == 'FCST_VILAGE':
             # 단기예보
@@ -105,8 +105,9 @@ class ApiServiceImpl(ApiService):
                         diff = date_time - convert_now
                         diff_hour = int(diff.total_seconds()/3600)
                         if diff_hour > 0 and diff_hour < 11:
-                            value = value_dict[category].replace('n', str(diff_hour))
-                            result[value] = fcst_value
+                            if category != 'TMX' and category != 'TMN':
+                                value = value_dict[category].replace('n', str(diff_hour))
+                                result[value] = fcst_value
                         
                         # 일차
                         # 1일 후 ~ 4일 후 하늘 상태, 최고/최저 기온, 강수확률 생성
@@ -129,7 +130,7 @@ class ApiServiceImpl(ApiService):
                                 result[value] = fcst_value
             except Exception as e:
                 Logger.error(api_logger, f'{e}\nargs: {e.args}')
-        Logger.info(api_logger, f'result: {result}')
+        Logger.info(api_logger, f'process_vilage_fcst result: {result}')
         return result
         
     # 중기육상예보, 중기기온조회
@@ -172,7 +173,7 @@ class ApiServiceImpl(ApiService):
         except Exception as e:
             Logger.error(api_logger, f'{e}\nargs: {e.args}')
         
-        Logger.info(api_logger, f'result: {result}')
+        Logger.info(api_logger, f'process_mid_fcst result: {result}')
         return result
     
     # 자외선지수
@@ -195,7 +196,7 @@ class ApiServiceImpl(ApiService):
                             result[value] = i[key]
             except Exception as e:
                 Logger.error(api_logger, f'{e}\nargs: {e.args}')
-        Logger.info(api_logger, f'result: {result}')
+        Logger.info(api_logger, f'process_living_wthr result: {result}')
         return result
     
     # 대기오염(미세먼지)
@@ -237,7 +238,7 @@ class ApiServiceImpl(ApiService):
                             break
             except Exception as e:
                 Logger.error(api_logger, f'{e}\nargs: {e.args}')
-        Logger.info(api_logger, f'result: {result}')
+        Logger.info(api_logger, f'process_arpltn result: {result}')
         return result
         
     # 출몰시각
@@ -258,7 +259,7 @@ class ApiServiceImpl(ApiService):
                     result[value] = item[key]
             except Exception as e:
                 Logger.error(api_logger, f'{e}\nargs: {e.args}')
-        Logger.info(api_logger, f'result: {result}')
+        Logger.info(api_logger, f'process_rise_set result: {result}')
         return result
     
 class SchedulingServiceImpl(SchedulingService):
@@ -301,10 +302,12 @@ class SchedulingServiceImpl(SchedulingService):
         )
         result_dict = copy.deepcopy(current_data[0])
         
-        # 조회 basetime(CALL_TIME)이 xx:15에 해당하면
-        # 강수확률을 1시간 후의 강수확률을 현재 강수확률에 복사
-        # 강수확률을 실시간으로 적용한 것처럼 보이기 위함
+        # 조회 basetime(CALL_TIME)이 xx:45에 해당하면
+        # 하늘상태, 강수형태, 강수확률을 1시간 후의 강수확률을 현재 강수확률에 복사
+        # 하늘상태, 강수형태, 강수확률을 실시간으로 적용한 것처럼 보이기 위함
         if ':45' in basetime:
+            result_dict['WD_DAY_SKY'] = result_dict['WD_DAY_SKY_1HR']
+            result_dict['WD_DAY_PTY'] = result_dict['WD_DAY_PTY_1HR']
             result_dict['WD_DAY_POP'] = result_dict['WD_DAY_POP_1HR']
         
         # API 목록 조회
@@ -369,7 +372,7 @@ class SchedulingServiceImpl(SchedulingService):
             sql_model=SqlModel(
                 select_keys=['REGION_NAME'],
                 tbl_name='tbl_api_code_list',
-                where_keys=['API_CODe'],
+                where_keys=['API_CODE'],
                 where_values=['STATION_NAME']
             )
         )
@@ -385,3 +388,4 @@ class SchedulingServiceImpl(SchedulingService):
         
         # DB 연결 종료
         MySQLDatabase.db_close(conn)
+        return 1
