@@ -189,7 +189,7 @@ class PreperenceServiceImpl(PreperenceService):
                 'STATION_NAME'
             ]
             
-            station_name = f'{station_value[0]['PROVINCE']} {station_value[0]['REGION']}'
+            station_name = f'{station_value[0]["PROVINCE"]} {station_value[0]["REGION"]}'
             
             update_set_list = [
                 (('REGION_NAME', 'REGION_CODE'), (station_value[0]['PROVINCE'], station_value[0]['PROVINCE'])),
@@ -217,7 +217,7 @@ class PreperenceServiceImpl(PreperenceService):
                 )
             result_code = ResultCode.SUCCESS
             result_msg = "SUCCESS"
-            result = {'province':station_value[0]['PROVINCE'], 'region':station_value[0]['REGION']}
+            result = {'province':station_value[0]["PROVINCE"], 'region':station_value[0]["REGION"]}
             Logger.info(preperence_logger, 'change_station_info 완료')
         except Exception as e:
             Logger.error(preperence_logger, f'{e}\nargs: {e.args}')
