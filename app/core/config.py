@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
+    VERSION = os.getenv('VERSION')
+    
     API_KEY = os.getenv('API_KEY')
     
     HOST = os.getenv('DB_HOST')

@@ -179,7 +179,7 @@ class ApiServiceImpl(ApiService):
     # 자외선지수
     def process_living_wthr(self, date: datetime.datetime, parameter, basetime:str):
         result = {}
-        now = date.strftime('%Y%m%d') + basetime.rstrip('0')
+        now = date.strftime('%Y%m%d') + basetime.rstrip('')
         living_wthr = LivingWthr(parameter['REGION_CODE'], now)
         
         if parameter['API_CODE'] == 'UV_IDX_V4_INFO':
@@ -217,7 +217,13 @@ class ApiServiceImpl(ApiService):
                 for i in item:
                     if i['dataTime'] == now:
                         for key, value in value_dict.items():
-                            result[value] = i[key]
+                            # result[value] = i[key]
+                            if i[key] == '-':
+                                    result[value] = 0
+                            elif i[key] == None:
+                                result[value] = 1
+                            else:
+                                result[value] = i[key]
                         break
                         
                 # 만약 아직 생성된 데이터가 없는 경우 다시 실행?

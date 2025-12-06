@@ -226,3 +226,33 @@ class PreperenceServiceImpl(PreperenceService):
             result = None
         MySQLDatabase.db_close(conn)
         return create_response(result_code, result_msg, result)
+    
+    # 현재 등록된 이미지 조회
+    def get_uploaded_image(self):
+        Logger.info(preperence_logger, 'get_uploaded_image 시작')
+        
+        conn = MySQLDatabase.db_connect()
+        try:
+            # 측정소 상세 정보를 조회
+            image_path = Repository.select(
+                cursor=conn.cursor(pymysql.cursors.DictCursor),
+                sql_model=SqlModel(
+                    select_keys=['CONCAT(ASSETS_PATH, ASSETS_FILE_NAME) AS abs_path'],
+                    tbl_name='tbl_assets',
+                    where_keys=['ASSETS_CTG', 'ASSETS_SEQ', 'ASSETS_DIV'],
+                    where_values=['preperence', '0', 'image']
+                )
+            )
+            result_code = ResultCode.SUCCESS
+            result_msg = "SUCCESS"
+            result = {'image_path':image_path[0]["abs_path"]}
+            Logger.info(preperence_logger, 'get_uploaded_image 완료')
+        except Exception as e:
+            Logger.error(preperence_logger, f'{e}\nargs: {e.args}')
+            result_code = ResultCode.INTERNAL_SERVER_ERROR
+            result_msg = "INTERNAL_SERVER_ERROR"
+            result = None
+        MySQLDatabase.db_close(conn)
+        return create_response(result_code, result_msg, result)
+    
+    # 디지털 액자용 이미지 등록

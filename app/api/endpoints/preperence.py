@@ -41,8 +41,11 @@ def change_station_info(params: StationData, preperence_service: PreperenceServi
     return preperence_service.change_station_info(params)
 
 # 현재 등록된 이미지 조회
-
+@router.get('/getUploadedImage.do')
+def get_uploaded_image(preperence_service:PreperenceService = Depends(get_perperence_service)):
+    return preperence_service.get_uploaded_image()
 
 # 디지털 액자용 이미지 등록
-
-
+@router.post('/uploadImage.do')
+def upload_image(preperence_service:PreperenceService = Depends(get_perperence_service)):
+    return preperence_service.upload_image()

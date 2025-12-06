@@ -44,5 +44,8 @@ def run_schedule_loop():
         schedule.run_pending()
 
 if __name__ == '__main__':
+    # schedule_service_impl = SchedulingServiceImpl()
+    # schedule_service_impl.scheduling_process('00:15')
+    
     schedule_creator()
     run_schedule_loop()

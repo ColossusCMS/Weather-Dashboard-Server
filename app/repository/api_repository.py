@@ -37,6 +37,7 @@ class VilageFcst:
                 Logger.info(api_logger, '단기예보 API 조회')
                 api = f"http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey={configs.API_KEY}&numOfRows=1000&pageNo=1&base_date={self.BASE_DATE}&base_time={self.BASE_TIME}&nx={self.NX}&ny={self.NY}&dataType=JSON"
             
+            print(f'vilage_fcst_info_service : {api}')
             # response = requests.get(api)
             # contents = response.text
             # json_ob = json.loads(contents)
@@ -70,6 +71,8 @@ class MidFcst:
                 # 중기기온조회 api
                 Logger.info(api_logger, '중기기온조회 API 조회')
                 api = f"http://apis.data.go.kr/1360000/MidFcstInfoService/getMidTa?serviceKey={configs.API_KEY}&numOfRows=10&pageNo=1&regId={self.REG_ID}&tmFc={self.TMFC}&dataType=JSON"
+            
+            print(f'mid_fcst_info_service : {api}')
             # response = requests.get(api)
             # contents = response.text
             # json_ob = json.loads(contents)
@@ -99,6 +102,8 @@ class LivingWthr:
                 # 자외선지수조회 api
                 Logger.info(api_logger, '자외선지수조회 API 조회')
                 api = f"http://apis.data.go.kr/1360000/LivingWthrIdxServiceV4/getUVIdxV4?serviceKey={configs.API_KEY}&pageNo=1&numOfRows=10&areaNo={self.AREA_NO}&time={self.TIME}&dataType=JSON"
+            
+            print(f'living_wthr_idx_service : {api}')
             # response = requests.get(api)
             # contents = response.text
             # json_ob = json.loads(contents)
@@ -126,6 +131,8 @@ class Arpltn:
                 # 측정소별 측정정보 조회 api
                 Logger.info(api_logger, '측정소별 측정정보 조회 API 조회')
                 api = f"http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?stationName={self.STATION_NAME}&dataTerm=daily&pageNo=1&numOfRows=100&returnType=json&serviceKey={configs.API_KEY}&ver=1.3"
+            
+            print(f'arpltn_info_service : {api}')
             # response = requests.get(api)
             # contents = response.text
             # json_ob = json.loads(contents)
@@ -155,6 +162,8 @@ class RiseSet:
                 # 지역별 해달 출몰시각 정보조회
                 Logger.info(api_logger, '지역별 해달 출몰시각 정보조회 API 조회')
                 api = f"http://apis.data.go.kr/B090041/openapi/service/RiseSetInfoService/getAreaRiseSetInfo?location={self.LOCATION}&locdate={self.LOCDATE}&ServiceKey={configs.API_KEY}"
+            
+            print(f'rise_set_info_service : {api}')
             # response = requests.get(api)
             # contents = response.text
             # json_ob = json.loads(contents)
